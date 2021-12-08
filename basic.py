@@ -90,7 +90,7 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
             _loss_list.append(_epoch_loss.cpu())
             count += 1
 
-            if vis is not None and j % 10 == 0:
+            if vis is not None and j % 10 == 9:
                 vis.line(np.array(_lr_list), np.arange(count), win="lr",
                          opts=dict(title="learning rate",
                                    xlabel="epochs",
@@ -122,7 +122,7 @@ def test_se(Model, snapshots, use_model_num):
             data, target = data.cuda(), target.cuda()
         output_list = [model(data).unsqueeze(0) for model in model_list]
         output = torch.mean(torch.cat(output_list), 0).squeeze()
-        test_loss += F.nll_loss(output, target).data[0]
+        test_loss += F.nll_loss(output, target).data
         pred = output.data.max(1)[1]
         correct += pred.eq(target.data).cpu().sum()
 
@@ -154,7 +154,7 @@ def train_normal(model, epochs, vis=None):
         _loss_list.append(_epoch_loss.cpu())
         _lr_list.append(optimizer.param_groups[0]['lr'])
 
-        if vis is not None and epoch % 10 == 0:
+        if vis is not None and epoch % 10 == 9:
             vis.line(np.array(_lr_list), np.arange(epoch+1), win="lr_n",
                      opts=dict(title="learning rate",
                                xlabel="epochs",
@@ -175,7 +175,7 @@ def test_normal(model):
         if cuda:
             data, target = data.cuda(), target.cuda()
         output = model(data)
-        test_loss += F.nll_loss(output, target).data[0]
+        test_loss += F.nll_loss(output, target).data
         pred = output.data.max(1)[1]
         correct += pred.eq(target.data).cpu().sum()
 

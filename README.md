@@ -1,5 +1,7 @@
 PyTorch implementation of [SNAPSHOT ENSEMBLES: TRAIN 1, GET M FOR FREE](https://arxiv.org/abs/1704.00109)
 
-`basic.py` is simple network for CIFAR10 classification. A result is shown below: accuracy is 74% for the proposed training method while 74% for normal training method.
+Corrected some errors in the code by moskomule and adapted the code to the latest PyTorch (version 1.10).
 
-![](simple_net.png)
+Several modifications have also been made to improve the performance.
+
+`basic.py` is simple network for CIFAR10 classification.
