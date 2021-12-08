@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.autograd import Variable
 
 import visdom
 import numpy as np
@@ -57,6 +56,7 @@ def proposed_lr(initial_lr, iteration, epoch_per_cycle):
     return initial_lr * (cos(pi * iteration / epoch_per_cycle) + 1) / 2
 
 
+def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
     """
     during an iteration a batch goes forward and backward  
     while during an epoch every batch of a data set is processed
@@ -78,17 +78,16 @@ def proposed_lr(initial_lr, iteration, epoch_per_cycle):
             for batch_idx, (data, target) in enumerate(train_loader):
                 if cuda:
                     data, target = data.cuda(), target.cuda()
-                data, target = Variable(data), Variable(target)
 
                 optimizer.zero_grad()
                 output = model(data)
                 loss = F.nll_loss(output, target)
-                _epoch_loss += loss.data[0]/len(train_loader)
+                _epoch_loss += loss.data/len(train_loader)
                 loss.backward()
                 optimizer.step()
 
             _lr_list.append(lr)
-            _loss_list.append(_epoch_loss)
+            _loss_list.append(_epoch_loss.cpu())
             count += 1
 
             if vis is not None and j % 10 == 0:
@@ -121,7 +120,6 @@ def test_se(Model, snapshots, use_model_num):
     for data, target in test_loader:
         if cuda:
             data, target = data.cuda(), target.cuda()
-        data, target = Variable(data), Variable(target)
         output_list = [model(data).unsqueeze(0) for model in model_list]
         output = torch.mean(torch.cat(output_list), 0).squeeze()
         test_loss += F.nll_loss(output, target).data[0]
@@ -145,16 +143,15 @@ def train_normal(model, epochs, vis=None):
         for batch_idx, (data, target) in enumerate(train_loader):
             if cuda:
                 data, target = data.cuda(), target.cuda()
-            data, target = Variable(data), Variable(target)
 
             optimizer.zero_grad()
             output = model(data)
             loss = F.nll_loss(output, target)
-            _epoch_loss += loss.data[0] / len(train_loader)
+            _epoch_loss += loss.data / len(train_loader)
             loss.backward()
             optimizer.step()
 
-        _loss_list.append(_epoch_loss)
+        _loss_list.append(_epoch_loss.cpu())
         _lr_list.append(optimizer.state_dict()["param_groups"][0]["lr"])
 
         if vis is not None and epoch % 10 == 0:
@@ -177,7 +174,6 @@ def test_normal(model):
     for data, target in test_loader:
         if cuda:
             data, target = data.cuda(), target.cuda()
-        data, target = Variable(data), Variable(target)
         output = model(data)
         test_loss += F.nll_loss(output, target).data[0]
         pred = output.data.max(1)[1]

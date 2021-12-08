@@ -20,7 +20,7 @@ def proposed_lr(initial_lr, iteration, epoch_per_cycle):
 
 def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
 
-    spapshots = []
+    snapshots = []
     _lr_list, _loss_list = [], []
     count = 0
     epochs_per_cycle = epochs // cycles
@@ -60,8 +60,8 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
                                    xlabel="epochs",
                                    ylabel="training loss (s.e.)"))
 
-        spapshots.append(model.state_dict())
-    return spapshots
+        snapshots.append(model.state_dict())
+    return snapshots
 
 
 def test_se(Model, weights, use_model_num, test_loader):
