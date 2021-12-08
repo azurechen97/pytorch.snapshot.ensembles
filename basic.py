@@ -73,7 +73,7 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
             _epoch_loss = 0
 
             lr = proposed_lr(initial_lr, j, epochs_per_cycle)
-            optimizer.state_dict()["param_groups"][0]["lr"] = lr
+            optimizer.param_groups[0]['lr'] = lr
 
             for batch_idx, (data, target) in enumerate(train_loader):
                 if cuda:
@@ -152,7 +152,7 @@ def train_normal(model, epochs, vis=None):
             optimizer.step()
 
         _loss_list.append(_epoch_loss.cpu())
-        _lr_list.append(optimizer.state_dict()["param_groups"][0]["lr"])
+        _lr_list.append(optimizer.param_groups[0]['lr'])
 
         if vis is not None and epoch % 10 == 0:
             vis.line(np.array(_lr_list), np.arange(epoch+1), win="lr_n",
