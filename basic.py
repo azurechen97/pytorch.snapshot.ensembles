@@ -47,7 +47,7 @@ class Net(nn.Module):
         x = F.relu(F.max_pool2d(self.conv3_bn(self.conv3(x)), 2))
         x = x.view(-1, 4 * 64)
         x = F.relu(self.dense1_bn(self.dense1(x)))
-        x = F.log_softmax(self.dense2(x)) # NLL loss expects log_softmax
+        x = F.log_softmax(self.dense2(x), dim=1) # NLL loss expects log_softmax
         return x
 
 
