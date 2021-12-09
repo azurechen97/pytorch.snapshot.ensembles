@@ -10,6 +10,8 @@ from torchvision import datasets, transforms
 import visdom
 import numpy as np
 
+import copy
+
 # variables
 cuda = torch.cuda.is_available()
 batch_size = 64
@@ -100,7 +102,7 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
                                    xlabel="epochs",
                                    ylabel="training loss (s.e.)"))
 
-        snapshots.append(model.state_dict())
+        snapshots.append(copy.deepcopy(model.state_dict()))
     return snapshots
 
 

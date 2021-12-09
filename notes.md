@@ -15,3 +15,4 @@ You should submit a 4-page long report, including what your goal was, a detailed
 - [x] why last m?
 - [ ] why average? how about max and voting?
 - [ ] use large first then cosine
+- [ ] save the model after each epoch
