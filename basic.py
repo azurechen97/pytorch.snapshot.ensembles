@@ -58,7 +58,7 @@ def proposed_lr(initial_lr, iteration, epoch_per_cycle):
     return initial_lr * (cos(pi * iteration / epoch_per_cycle) + 1) / 2
 
 
-def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
+def train_se(model, epochs, cycles, initial_lr, vis=None):
     """
     during an iteration a batch goes forward and backward  
     while during an epoch every batch of a data set is processed
@@ -74,10 +74,10 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
         for j in range(epochs_per_cycle):
             _epoch_loss = 0
 
-            lr = proposed_lr(initial_lr, j, epochs_per_cycle)
-            optimizer.param_groups[0]['lr'] = lr
-
             for batch_idx, (data, target) in enumerate(train_loader):
+                lr = proposed_lr(initial_lr, j+batch_idx /
+                                 batch_size, epochs_per_cycle)
+                optimizer.param_groups[0]['lr'] = lr
                 if cuda:
                     data, target = data.cuda(), target.cuda()
 
@@ -88,7 +88,7 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
                 loss.backward()
                 optimizer.step()
 
-            _lr_list.append(lr)
+            _lr_list.append(optimizer.param_groups[0]['lr'])
             _loss_list.append(_epoch_loss.cpu())
             count += 1
 
@@ -101,6 +101,11 @@ def train_se(model, epochs, cycles, initial_lr, train_loader, vis=None):
                          opts=dict(title="loss",
                                    xlabel="epochs",
                                    ylabel="training loss (s.e.)"))
+                vis.line(np.array(_loss_list), np.arange(count),  win="loss (log)",
+                         opts=dict(title="loss (log)",
+                                   xlabel="epochs",
+                                   ylabel="training loss (s.e.)",
+                                   ytype="log"))
 
         snapshots.append(copy.deepcopy(model.state_dict()))
     return snapshots
